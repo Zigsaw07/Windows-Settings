@@ -19,7 +19,21 @@ foreach ($icon in $icons.Values) {
 $shell = New-Object -ComObject Shell.Application
 $shell.Namespace(0).Self.InvokeVerb("R&efresh")
 
-# === 2) Taskbar Behaviour: Combine Taskbar Buttons -> When taskbar is full ===
+# === 2) Enable All Folders in Start Menu ===
+$startFoldersPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
+
+$folders = @(
+    "Start_ShowDocuments","Start_ShowDownloads","Start_ShowMusic",
+    "Start_ShowPictures","Start_ShowVideos","Start_ShowRun",
+    "Start_ShowNetwork","Start_ShowPersonalFolder","Start_ShowSettings",
+    "Start_ShowFileExplorer"
+)
+
+foreach ($f in $folders) {
+    Set-ItemProperty -Path $startFoldersPath -Name $f -Value 1
+}
+
+# === 3) Taskbar Behaviour: Combine Taskbar Buttons -> When taskbar is full ===
 # 0 = Always, 1 = When full, 2 = Never
 Set-ItemProperty -Path $startFoldersPath -Name "TaskbarGlomLevel" -Value 1
 
