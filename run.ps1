@@ -1,8 +1,10 @@
 # Run PowerShell as Administrator before executing this script!
 
-# === 1) Enable All Desktop Icons ===
+# 1) Enable All Desktop Icons
+# This enables: This PC, User’s Files, Network, Recycle Bin, Control Panel
 $desktopIconPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel"
 
+# GUIDs for system icons
 $icons = @{
     "ThisPC"        = "{20D04FE0-3AEA-1069-A2D8-08002B30309D}"
     "UserFiles"     = "{59031a47-3f72-44a7-89c5-5595fe6b30ee}"
@@ -15,29 +17,30 @@ foreach ($icon in $icons.Values) {
     Set-ItemProperty -Path $desktopIconPath -Name $icon -Value 0 -Force
 }
 
-# Refresh desktop
+# Refresh desktop to show icons
 $shell = New-Object -ComObject Shell.Application
 $shell.Namespace(0).Self.InvokeVerb("R&efresh")
 
-# === 2) Enable All Folders in Start Menu ===
+
+# 2) Enable All Folders in Start Menu (Settings > Personalization > Start > Folders)
 $startFoldersPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
 
-$folders = @(
-    "Start_ShowDocuments","Start_ShowDownloads","Start_ShowMusic",
-    "Start_ShowPictures","Start_ShowVideos","Start_ShowRun",
-    "Start_ShowNetwork","Start_ShowPersonalFolder","Start_ShowSettings",
-    "Start_ShowFileExplorer"
-)
+Set-ItemProperty -Path $startFoldersPath -Name "Start_ShowDocuments" -Value 1
+Set-ItemProperty -Path $startFoldersPath -Name "Start_ShowDownloads" -Value 1
+Set-ItemProperty -Path $startFoldersPath -Name "Start_ShowMusic" -Value 1
+Set-ItemProperty -Path $startFoldersPath -Name "Start_ShowPictures" -Value 1
+Set-ItemProperty -Path $startFoldersPath -Name "Start_ShowVideos" -Value 1
+Set-ItemProperty -Path $startFoldersPath -Name "Start_ShowRun" -Value 1
+Set-ItemProperty -Path $startFoldersPath -Name "Start_ShowNetwork" -Value 1
+Set-ItemProperty -Path $startFoldersPath -Name "Start_ShowPersonalFolder" -Value 1
+Set-ItemProperty -Path $startFoldersPath -Name "Start_ShowSettings" -Value 1
+Set-ItemProperty -Path $startFoldersPath -Name "Start_ShowFileExplorer" -Value 1
 
-foreach ($f in $folders) {
-    Set-ItemProperty -Path $startFoldersPath -Name $f -Value 1
-}
 
-# === 3) Taskbar Behaviour: Combine Taskbar Buttons -> When taskbar is full ===
-# 0 = Always, 1 = When full, 2 = Never
-Set-ItemProperty -Path $startFoldersPath -Name "TaskbarGlomLevel" -Value 1
+# 3) Taskbar Behaviour: Combine Taskbar Buttons -> When taskbar is full
+# Registry values: 0 = Always, 1 = When full, 2 = Never
+$taskbarPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
+Set-ItemProperty -Path $taskbarPath -Name "TaskbarGlomLevel" -Value 1
 
-Write-Host "✅ All settings applied. Restarting Explorer..." -ForegroundColor Green
 
-Stop-Process -Name explorer -Force
-Start-Process explorer.exe
+Write-Host "✅ Settings Applied. Some changes may require restarting Explorer or logging out/in." -ForegroundColor Green
